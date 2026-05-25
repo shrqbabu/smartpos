@@ -1,6 +1,13 @@
-import { collection, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  onSnapshot
+} from 'firebase/firestore';
 import { db } from '../firebase/config';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -8,7 +15,6 @@ import { Badge } from '../components/ui/Badge';
 import { Table } from '../components/ui/Table';
 import { Modal, ConfirmModal } from '../components/ui/Modal';
 import { Input, Select, Textarea } from '../components/ui/Input';
-import { DEMO_PRODUCTS, DEMO_CATEGORIES } from '../data/demoData';
 import { Plus, Search, Edit, Trash2, Package, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -54,6 +60,26 @@ export default function Products() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState<typeof defaultForm>(defaultForm);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+  const unsubscribe = onSnapshot(
+    collection(db, 'products'),
+    (snapshot) => {
+      const items: Product[] = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Product[];
+
+      setProducts(items);
+    },
+    (error) => {
+      console.error(error);
+      toast.error('Failed to load products');
+    }
+  );
+
+  return () => unsubscribe();
+}, []);
 
   const filtered = products.filter(p => {
     const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.barcode?.includes(search);
