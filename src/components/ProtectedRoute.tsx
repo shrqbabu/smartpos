@@ -11,19 +11,18 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   requiredRole,
 }) => {
-  const { user, loading } = useAuth();
+  const { currentUser, loading } = useAuth();
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (!user) {
+  if (!currentUser) {
     return <Navigate to="/login" replace />;
   }
 
-  // Optional role check
-  if (requiredRole && user.role) {
-    if (!requiredRole.includes(user.role)) {
+  if (requiredRole) {
+    if (!requiredRole.includes(currentUser.role)) {
       return <Navigate to="/dashboard" replace />;
     }
   }
