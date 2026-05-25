@@ -39,7 +39,7 @@ export default function Login() {
       await signIn(email, password);
       toast.success('Welcome back!');
       setLoading(false);
-      navigate('/dashboard');
+      navigate('/Dashboard');
     } catch (err: any) {
       console.error(err);
       setError(getFirebaseError(err?.code || ''));
