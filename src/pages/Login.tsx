@@ -9,13 +9,12 @@ const DEMO_CREDENTIALS = [
   { role: 'Cashier', email: 'cashier@smartpos.com', password: 'cash123' },
 ];
 
-// Firebase error codes ko readable messages mein convert karo
 const getFirebaseError = (code: string): string => {
   const errors: Record<string, string> = {
     'auth/user-not-found': 'Yeh email registered nahi hai',
     'auth/wrong-password': 'Password galat hai',
     'auth/invalid-email': 'Email format sahi nahi hai',
-    'auth/user-disabled': 'Yeh account disable kar diya gaya hai',
+    'auth/user-disabled': 'Yeh account disable hai',
     'auth/too-many-requests': 'Zyada attempts — thodi der baad try karo',
     'auth/network-request-failed': 'Network error — internet check karo',
     'auth/invalid-credential': 'Email ya password galat hai',
@@ -43,8 +42,7 @@ export default function Login() {
       navigate('/dashboard');
     } catch (err: any) {
       console.error(err);
-      const msg = getFirebaseError(err?.code || '');
-      setError(msg);
+      setError(getFirebaseError(err?.code || ''));
       setLoading(false);
     }
   };
@@ -168,10 +166,7 @@ export default function Login() {
                 {loading ? (
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
-                  <>
-                    Sign In
-                    <ChevronRight className="w-4 h-4" />
-                  </>
+                  <>Sign In <ChevronRight className="w-4 h-4" /></>
                 )}
               </button>
             </form>
@@ -187,10 +182,7 @@ export default function Login() {
                   <button
                     key={cred.email}
                     type="button"
-                    onClick={() => {
-                      setEmail(cred.email);
-                      setPassword(cred.password);
-                    }}
+                    onClick={() => { setEmail(cred.email); setPassword(cred.password); }}
                     className="w-full flex items-center justify-between p-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all text-left group"
                   >
                     <div>
