@@ -2,8 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Zap, Eye, EyeOff, Mail, Lock, AlertCircle, ChevronRight } from 'lucide-react';
 import { signIn } from '../firebase/auth';
-import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+
+// ✅ Fix 2: DEMO_CREDENTIALS array define kiya
+const DEMO_CREDENTIALS = [
+  { role: 'Admin', email: 'admin@smartpos.com', password: 'admin123' },
+  { role: 'Cashier', email: 'cashier@smartpos.com', password: 'cash123' },
+];
 
 export default function Login() {
   const navigate = useNavigate();
@@ -12,28 +17,25 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isDemoMode, setIsDemoMode] = useState(false);
+  // ✅ Fix 3: isDemoMode unused tha, hata diya
 
+  // ✅ Fix 1: Extra closing brace `}` hata diya
   const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError('');
-  setLoading(true);
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-  try {
-    // Try Firebase auth first
-    await signIn(email, password);
-
-    toast.success('Welcome back!');
-    navigate('/dashboard');
-
-  } catch (err: any) {
-    console.error(err);
-    setError('Invalid email or password');
-  } finally {
-    setLoading(false);
-  }
-};
-  }
+    try {
+      await signIn(email, password);
+      toast.success('Welcome back!');
+      navigate('/dashboard');
+    } catch (err: any) {
+      console.error(err);
+      setError('Invalid email or password');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 flex">
@@ -44,7 +46,7 @@ export default function Login() {
           <div className="absolute top-20 left-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-20 right-10 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl" />
         </div>
-        
+
         <div className="relative">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
@@ -60,7 +62,7 @@ export default function Login() {
             <span className="block text-indigo-400">for Smart Business</span>
           </h2>
           <p className="text-slate-400 text-base leading-relaxed max-w-md">
-            Complete POS solution with inventory management, customer tracking, 
+            Complete POS solution with inventory management, customer tracking,
             sales analytics, and real-time Firebase sync.
           </p>
 
