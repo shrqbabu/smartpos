@@ -44,7 +44,7 @@ export default function Login() {
       if (user) {
         unsubscribe();
         setLoading(false);
-        navigate('/dashboard', { replace: true });
+        navigate('/Dashboard', { replace: true });
       }
     });
 
