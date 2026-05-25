@@ -1,4 +1,6 @@
 // App-wide State Context for POS System
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebase/config';
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { DEMO_PRODUCTS, DEMO_CATEGORIES, DEMO_CUSTOMERS } from '../data/demoData';
 
@@ -91,10 +93,69 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Load demo data (replace with Firebase subscriptions when configured)
   useEffect(() => {
-    setProducts(DEMO_PRODUCTS as Product[]);
-    setCategories(DEMO_CATEGORIES as Category[]);
-    setCustomers(DEMO_CUSTOMERS as Customer[]);
-  }, []);
+
+  const fetchData = async () => {
+    try {
+
+      // PRODUCTS
+      const productsSnapshot = await getDocs(collection(db, 'products'));
+
+      if (!productsSnapshot.empty) {
+        const firebaseProducts = productsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Product[];
+
+        setProducts(firebaseProducts);
+
+      } else {
+        setProducts(DEMO_PRODUCTS as Product[]);
+      }
+
+      // CATEGORIES
+      const categoriesSnapshot = await getDocs(collection(db, 'categories'));
+
+      if (!categoriesSnapshot.empty) {
+        const firebaseCategories = categoriesSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Category[];
+
+        setCategories(firebaseCategories);
+
+      } else {
+        setCategories(DEMO_CATEGORIES as Category[]);
+      }
+
+      // CUSTOMERS
+      const customersSnapshot = await getDocs(collection(db, 'customers'));
+
+      if (!customersSnapshot.empty) {
+        const firebaseCustomers = customersSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Customer[];
+
+        setCustomers(firebaseCustomers);
+
+      } else {
+        setCustomers(DEMO_CUSTOMERS as Customer[]);
+      }
+
+    } catch (error) {
+
+      console.error(error);
+
+      // fallback
+      setProducts(DEMO_PRODUCTS as Product[]);
+      setCategories(DEMO_CATEGORIES as Category[]);
+      setCustomers(DEMO_CUSTOMERS as Customer[]);
+    }
+  };
+
+  fetchData();
+
+}, []);
 
   // Apply theme
   useEffect(() => {
