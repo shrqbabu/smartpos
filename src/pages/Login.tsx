@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { Zap, Eye, EyeOff, Mail, Lock, AlertCircle, ChevronRight } from 'lucide-react';
 import { signIn, onAuthChange } from '../firebase/auth'; // ✅ onAuthChange add kiya
@@ -41,13 +40,12 @@ export default function Login() {
     toast.success('Welcome back!');
 
     // ✅ onAuthStateChanged ka wait karo navigate se pehle
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        unsubscribe();
-        setLoading(false);
-        navigate('/dashboard', { replace: true });
-      }
-    });
+   onAuthChange((user) => {
+  if (user) {
+    setLoading(false);
+    navigate('/dashboard', { replace: true });
+  }
+});
 
   } catch (err: any) {
     console.error(err);
