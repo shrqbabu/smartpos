@@ -4,11 +4,24 @@ import { Zap, Eye, EyeOff, Mail, Lock, AlertCircle, ChevronRight } from 'lucide-
 import { signIn } from '../firebase/auth';
 import toast from 'react-hot-toast';
 
-// ✅ Fix 2: DEMO_CREDENTIALS array define kiya
 const DEMO_CREDENTIALS = [
   { role: 'Admin', email: 'admin@smartpos.com', password: 'admin123' },
   { role: 'Cashier', email: 'cashier@smartpos.com', password: 'cash123' },
 ];
+
+// Firebase error codes ko readable messages mein convert karo
+const getFirebaseError = (code: string): string => {
+  const errors: Record<string, string> = {
+    'auth/user-not-found': 'Yeh email registered nahi hai',
+    'auth/wrong-password': 'Password galat hai',
+    'auth/invalid-email': 'Email format sahi nahi hai',
+    'auth/user-disabled': 'Yeh account disable kar diya gaya hai',
+    'auth/too-many-requests': 'Zyada attempts — thodi der baad try karo',
+    'auth/network-request-failed': 'Network error — internet check karo',
+    'auth/invalid-credential': 'Email ya password galat hai',
+  };
+  return errors[code] || 'Login fail hua, dobara try karo';
+};
 
 export default function Login() {
   const navigate = useNavigate();
@@ -17,9 +30,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  // ✅ Fix 3: isDemoMode unused tha, hata diya
 
-  // ✅ Fix 1: Extra closing brace `}` hata diya
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -28,11 +39,12 @@ export default function Login() {
     try {
       await signIn(email, password);
       toast.success('Welcome back!');
+      setLoading(false);
       navigate('/dashboard');
     } catch (err: any) {
       console.error(err);
-      setError('Invalid email or password');
-    } finally {
+      const msg = getFirebaseError(err?.code || '');
+      setError(msg);
       setLoading(false);
     }
   };
@@ -41,7 +53,6 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 flex">
       {/* Left Panel - Branding */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 relative overflow-hidden">
-        {/* Background decorations */}
         <div className="absolute inset-0">
           <div className="absolute top-20 left-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
           <div className="absolute bottom-20 right-10 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl" />
@@ -122,8 +133,7 @@ export default function Login() {
                     onChange={e => setEmail(e.target.value)}
                     placeholder="admin@smartpos.com"
                     required
-                    className="w-full bg-white/10 border border-white/20 rounded-xl px-10 py-3 text-white placeholder:text-slate-500 text-sm
-                      focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                    className="w-full bg-white/10 border border-white/20 rounded-xl px-10 py-3 text-white placeholder:text-slate-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
                   />
                 </div>
               </div>
@@ -138,8 +148,7 @@ export default function Login() {
                     onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••"
                     required
-                    className="w-full bg-white/10 border border-white/20 rounded-xl px-10 py-3 text-white placeholder:text-slate-500 text-sm
-                      focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                    className="w-full bg-white/10 border border-white/20 rounded-xl px-10 py-3 text-white placeholder:text-slate-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
                   />
                   <button
                     type="button"
@@ -154,9 +163,7 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-medium text-sm
-                  flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-50
-                  disabled:cursor-not-allowed active:scale-98 shadow-lg shadow-indigo-500/25"
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-indigo-500/25"
               >
                 {loading ? (
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -184,8 +191,7 @@ export default function Login() {
                       setEmail(cred.email);
                       setPassword(cred.password);
                     }}
-                    className="w-full flex items-center justify-between p-2.5 rounded-lg bg-white/5 hover:bg-white/10
-                      border border-white/10 transition-all text-left group"
+                    className="w-full flex items-center justify-between p-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all text-left group"
                   >
                     <div>
                       <span className="text-xs font-semibold text-white">{cred.role}</span>
@@ -201,7 +207,7 @@ export default function Login() {
           </div>
 
           <p className="text-center text-xs text-slate-600 mt-4">
-            Demo mode active • No real Firebase connection required
+            Firebase Authentication Active
           </p>
         </div>
       </div>
